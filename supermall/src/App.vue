@@ -1,14 +1,17 @@
 <template>
   <div id="app">
-    <mian-tab-bar></mian-tab-bar>
+    <main-tab-bar></main-tab-bar>
     <router-view/>
   </div>
 </template>
 <script>
 require("normalize.css")
-import MianTabBar from './components/content/MainTabBar'
+import MainTabBar from './components/content/MainTabBar'
 export default {
-  name:'app'
+  name:'app',
+  components:{
+    MainTabBar
+  }
 }
 </script>
 <style>

@@ -7,11 +7,11 @@
 </template>
 
 <script>
-  import NavBar from 'components/common/navbar/NavBar';
+  import NavBar from '../../components/common/navbar/NavBar';
   import HomeSwiper from './childComps/HomeSwiper'
   import RecommendView from './childComps/RecommendView'
 
-  import {getHomeMultidata} from "network/home";
+  import {getHomeMultidata} from "../../network/home";
 
   export default {
     name: "Home",
