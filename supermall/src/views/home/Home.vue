@@ -9,61 +9,12 @@
           <img :src="item.image" alt="" >
         </a>
       </swiper-item>
-    </swiper> -->
+    </swiper>-->
     <home-swiper :banners="banners" />
     <recommend-view :recommends="recommends" />
     <feature-view></feature-view>
-    <tab-control :titles="['流行','新款','精选']"></tab-control>
-    <div>内容1</div>
-    <div>内容2</div>
-    <div>内容3</div>
-    <div>内容4</div>
-    <div>内容5</div>
-    <div>内容6</div>
-    <div>内容7</div>
-    <div>内容8</div>
-    <div>内容9</div>
-    <div>内容10</div>
-    <div>内容11</div>
-    <div>内容12</div>
-    <div>内容13</div>
-    <div>内容14</div>
-    <div>内容15</div>
-    <div>内容16</div>
-    <div>内容17</div>
-    <div>内容18</div>
-    <div>内容19</div>
-    <div>内容20</div>
-    <div>内容21</div>
-    <div>内容22</div>
-    <div>内容23</div>
-    <div>内容24</div>
-    <div>内容25</div>
-    <div>内容26</div>
-    <div>内容27</div>
-    <div>内容28</div>
-    <div>内容29</div>
-    <div>内容30</div>
-    <div>内容31</div>
-    <div>内容32</div>
-    <div>内容33</div>
-    <div>内容34</div>
-    <div>内容35</div>
-    <div>内容36</div>
-    <div>内容37</div>
-    <div>内容38</div>
-    <div>内容39</div>
-    <div>内容40</div>
-    <div>内容41</div>
-    <div>内容42</div>
-    <div>内容43</div>
-    <div>内容44</div>
-    <div>内容45</div>
-    <div>内容46</div>
-    <div>内容47</div>
-    <div>内容48</div>
-    <div>内容49</div>
-    <div>内容50</div>
+    <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick"></tab-control>
+    <goods-list :goods="showGoods"></goods-list>
   </div>
 </template>
 
@@ -71,11 +22,13 @@
 import HomeSwiper from './childComps/HomeSwiper'
 import RecommendView from './childComps/RecommendView'
 import FeatureView from './childComps/FeatureView'
+import GoodsList from '../../components/content/goods/GoodsList'
+import GoodsListItem from '../../components/content/goods/GoodsListItem'
 
 import NavBar from '../../components/common/navbar/NavBar';
 import TabControl from '../../components/content/tabControl/TabControl'
 
-import { getHomeMultidata } from "../../network/home";
+import { getHomeMultidata, getHomeGoods } from "../../network/home";
 
 export default {
   name: "Home",
@@ -83,34 +36,83 @@ export default {
     HomeSwiper,
     FeatureView,
     RecommendView,
+    GoodsList,
+    GoodsListItem,
     NavBar,
     TabControl,
   },
   data () {
     return {
       banners: [],
-      recommends: []
+      recommends: [],
+      goods: {
+        'pop': { page: 0, list: [] },
+        'new': { page: 0, list: [] },
+        'sell': { page: 0, list: [] },
+      },
+      currentType: 'pop'
     }
+  },
+  computed: {
+    showGoods () {
+      return this.goods[this.currentType].list
+    },
   },
   created () {
     // 1.请求多个数据
-    getHomeMultidata().then(res => {
-      // this.result = res;
-      this.banners = res.data.banner.list;
-      this.recommends = res.data.recommend.list;
-    })
-  }
+
+    this.getHomeMultidata()
+
+    //2.请求商品数据
+    this.getHomeGoods('pop')
+    this.getHomeGoods('new')
+    this.getHomeGoods('sell')
+  },
+  methods: {
+    /**
+     * 时间监听相关代码
+     */
+    tabClick (index) {
+      this.currentType = Object.keys(this.goods)[index]
+      // console.log(index);
+    },
+    /**
+     * 网络请求相关代码
+     */
+    getHomeMultidata () {
+      getHomeMultidata().then(res => {
+        // this.result = res;
+        this.banners = res.data.banner.list;
+        this.recommends = res.data.recommend.list;
+      })
+    },
+    getHomeGoods (type) {
+      const page = this.goods[type].page + 1
+      getHomeGoods(type, page).then(res => {
+        this.goods[type].list.push(...res.data.list)
+        this.goods[type].page += 1
+        // console.log(res.data.list);
+      })
+    }
+  },
 }
 </script>
 
 <style scoped>
-#home{
-  position: sticky;
-  top:0;
-  left: 0;
+#home {
+  padding-top: 44px;
 }
 .home-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: var(--color-tint);
   color: #fff;
+  z-index: 9;
+}
+.tab-control {
+  position: sticky;
+  top: 44px;
 }
 </style>
